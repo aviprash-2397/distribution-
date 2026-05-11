@@ -252,7 +252,7 @@ textarea{resize:none;height:70px}
 // ===================== CONFIG =====================
 const SUPABASE_URL = 'https://icboixkgnqkprljbledd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljYm9peGtnbnFrcHJsamJsZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MTgyNzIsImV4cCI6MjA5NDA5NDI3Mn0.4dg7sy_kMU2EJlqN1qzNodPAsb2VRLJBCGVtU5cgWl4';
-const ADMIN_PASSWORD = 'admin123'; // ⚠️ CHANGE THIS
+const ADMIN_PASSWORD = 'admin123'; 
 const FATHER_WHATSAPP = '919973478456'; 
 
 // ===================== DB =====================
@@ -444,7 +444,7 @@ function setQty(pid, name, sku, company, rate, img, val) {
 function upsertCart(pid, name, sku, company, rate, img, qty) {
   const idx = S.cart.findIndex(c => c.pid === pid);
   if (qty <= 0) { 
-    if (idx > -1 && S.cart[idx].bonus === 0) S.cart.splice(idx, 1); 
+    if (idx > -1 && (!S.cart[idx].bonus || S.cart[idx].bonus === 0)) S.cart.splice(idx, 1); 
     else if (idx > -1) S.cart[idx].qty = 0;
   }
   else if (idx > -1) S.cart[idx].qty = qty;
@@ -523,7 +523,7 @@ function updateCartItem(pid, field, val) {
   if (isNaN(v) || v < 0) v = 0;
   item[field] = v;
   
-  if (item.qty === 0 && item.bonus === 0) {
+  if (item.qty === 0 && (!item.bonus || item.bonus === 0)) {
     S.cart = S.cart.filter(c => c.pid !== pid);
   }
   renderCart();
@@ -580,7 +580,6 @@ async function placeOrder() {
       rate: c.rate || 0
     })));
 
-    // Get order number for WhatsApp
     const { data: ord2 } = await db.from('orders').select('order_number').eq('id', orderId).single();
     const retailerName = S.retailers.find(r => r.id === retailer_id)?.name || '';
     
@@ -603,7 +602,7 @@ async function placeOrder() {
       `📅 Date: ${fmtDate(new Date().toISOString())}\n` +
       (delivery_date ? `🚚 Deliver by: ${fmtDate(delivery_date)}\n` : '') +
       `\n*Items:*\n${itemLines}\n` +
-      `\n💰 *Total Amount: ₹${totalAmt}*\n\n` +
+      `\n💰 *Total Amount: ₹${totalAmt.toFixed(2)}*\n\n` +
       `💳 Payment: ${payment_term === 'cash' ? 'Cash' : 'Credit (' + credit_period_days + ' days)'}\n` +
       (notes ? `📝 Notes: ${notes}\n` : '')
     );
@@ -622,7 +621,7 @@ async function placeOrder() {
   }
 }
 
-// ===================== SALESMAN ORDER HISTORY =====================
+// ===================== SALESMAN HISTORY =====================
 async function loadSalesmanOrders() {
   if (!S.salesman) return;
   const el = document.getElementById('salesman-orders');
@@ -648,7 +647,7 @@ async function loadSalesmanOrders() {
         if (i.bonus_quantity > 0) text += ` <span style="color:var(--or);font-size:11px">(+${i.bonus_quantity} free)</span>`;
         return `<div class="oi-row"><span>${i.products?.name}</span><span>${text}</span></div>`;
       }).join('')}</div>
-      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total: ₹${totalValue}</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total: ₹${totalValue.toFixed(2)}</div>
       <div class="of">
         <span class="badge b-${o.payment_term}">${o.payment_term}</span>
         <span class="badge b-${o.payments?.[0]?.status||'unpaid'}">${o.payments?.[0]?.status === 'paid' ? '💚 Paid' : '🔴 Unpaid'}</span>
@@ -703,7 +702,7 @@ async function resendWhatsApp(orderId) {
   }).join('\n');
   
   const msg = encodeURIComponent(
-    `📦 *Order ${fmtOrder(o.order_number)}*\n🏢 Vinita Enterprises\n👤 ${o.salesmen?.name}\n🏪 ${o.retailers?.name}\n📅 ${fmtDate(o.order_date)}\n\n*Items:*\n${itemLines}\n\n💰 *Total Amount: ₹${totalAmt}*\n\n💳 ${o.payment_term === 'cash' ? 'Cash' : 'Credit ('+o.credit_period_days+'d)'}${o.notes ? '\n📝 '+o.notes : ''}`
+    `📦 *Order ${fmtOrder(o.order_number)}*\n🏢 Vinita Enterprises\n👤 ${o.salesmen?.name}\n🏪 ${o.retailers?.name}\n📅 ${fmtDate(o.order_date)}\n\n*Items:*\n${itemLines}\n\n💰 *Total Amount: ₹${totalAmt.toFixed(2)}*\n\n💳 ${o.payment_term === 'cash' ? 'Cash' : 'Credit ('+o.credit_period_days+'d)'}${o.notes ? '\n📝 '+o.notes : ''}`
   );
   window.open(`https://wa.me/${FATHER_WHATSAPP}?text=${msg}`, '_blank');
 }
@@ -776,7 +775,7 @@ function renderAdminOrders(orders) {
         if (i.bonus_quantity > 0) text += ` <span style="color:var(--or);font-size:11px">(+${i.bonus_quantity} free)</span>`;
         return `<div class="oi-row"><span>${i.products?.name}</span><span>${text}</span></div>`;
       }).join('')}</div>
-      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total Value: ₹${totalValue}</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total Value: ₹${totalValue.toFixed(2)}</div>
       ${o.notes ? `<div style="font-size:13px;color:var(--mu);margin-bottom:6px">📝 ${o.notes}</div>` : ''}
       <div class="of">
         <span class="badge b-${o.payment_term}">${o.payment_term}${o.payment_term==='credit' ? ' ('+o.credit_period_days+'d)':''}</span>
@@ -798,7 +797,7 @@ async function markPaid(paymentId) {
   toast('💰 Payment marked as paid'); loadAdminDashboard();
 }
 
-// ===================== ADMIN TABS =====================
+// ===================== ADMIN TABS & MANAGE =====================
 function switchAdminTab(tab, el) {
   document.querySelectorAll('#pg-admin .tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -809,7 +808,6 @@ function switchAdminTab(tab, el) {
   if (tab === 'manage') loadManage();
 }
 
-// ===================== REPORTS =====================
 async function loadReports() {
   const el = document.getElementById('reports-content');
   el.innerHTML = '<div class="load">Loading...</div>';
@@ -818,7 +816,6 @@ async function loadReports() {
     .order('order_date', {ascending:false});
   if (!data?.length) { el.innerHTML = '<div class="empty"><div class="ei">📊</div>No data yet.</div>'; return; }
 
-  // Last 7 days
   const days = {};
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate()-i);
@@ -826,15 +823,10 @@ async function loadReports() {
   }
   data.forEach(o => { if (o.order_date in days) days[o.order_date]++; });
   const maxD = Math.max(...Object.values(days), 1);
-
-  // By salesman
   const bySM = {};
   data.forEach(o => { const n = o.salesmen?.name||'?'; bySM[n] = (bySM[n]||0)+1; });
-
-  // By retailer
   const byRT = {};
   data.forEach(o => { const n = o.retailers?.name||'?'; byRT[n] = (byRT[n]||0)+1; });
-
   const unpaid = data.filter(o => o.payments?.[0]?.status !== 'paid').length;
 
   el.innerHTML = `
@@ -860,14 +852,9 @@ async function loadReports() {
       <table class="tbl"><thead><tr><th>Retailer</th><th>Orders</th></tr></thead><tbody>
         ${Object.entries(byRT).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<tr><td>${n}</td><td><strong>${c}</strong></td></tr>`).join('')}
       </tbody></table>
-    </div>
-    <div class="card">
-      <div style="font-weight:600;margin-bottom:4px">💰 Payment Overview</div>
-      <div style="font-size:14px;color:var(--mu)">${unpaid} unpaid order${unpaid!==1?'s':''} out of ${data.length} total</div>
     </div>`;
 }
 
-// ===================== MANAGE =====================
 function loadManage() {
   document.getElementById('manage-content').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
@@ -886,83 +873,101 @@ async function showForm(type) {
       <div class="fg"><label>Company Name *</label><input id="m-cn" placeholder="e.g. HUL, ITC, P&G"></div>
       <button class="btn btn-or" onclick="addCompany()">Add Company</button></div>`;
   } else if (type === 'product') {
-    // Load companies first
     if (!S.companies.length) { const {data} = await db.from('companies').select('*').order('name'); S.companies = data||[]; }
     el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Product</div>
       <div class="fg"><label>Company *</label><select id="m-pcmp">${S.companies.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
       <div class="fg"><label>Product Name *</label><input id="m-pn" placeholder="e.g. Surf Excel 1kg"></div>
       <div class="fg"><label>SKU Code *</label><input id="m-psku" placeholder="e.g. HUL-SE-1KG"></div>
-      <div class="fg"><label>Category</label><input id="m-pcat" placeholder="e.g. Detergent, Beverages"></div>
-      <div class="fg"><label>Pack Size</label><input id="m-psz" placeholder="e.g. 1kg, 500ml, 12pcs"></div>
+      <div class="fg"><label>Category</label><input id="m-pcat" placeholder="e.g. Detergent"></div>
+      <div class="fg"><label>Pack Size</label><input id="m-psz" placeholder="e.g. 1kg"></div>
       <div class="fg"><label>Rate (₹) *</label><input id="m-prate" type="number" placeholder="0.00" step="0.01"></div>
       <div class="fg"><label>MRP (₹)</label><input id="m-pmrp" type="number" placeholder="0.00" step="0.01"></div>
-      <div class="fg"><label>Image URL</label><input id="m-pimg" placeholder="https://..."></div>
+      <div class="fg"><label>Product Photo</label>
+        <input type="file" id="m-pimg-file" accept="image/*" onchange="handleImageUpload(this)" style="padding:8px">
+        <input type="hidden" id="m-pimg-b64">
+        <div id="img-preview-container" style="margin-top:10px;display:none">
+          <img id="img-preview" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)">
+        </div>
+      </div>
       <div class="fg"><label>Notes</label><input id="m-pnt" placeholder="Optional"></div>
       <button class="btn btn-or" onclick="addProduct()">Add Product</button></div>`;
   } else if (type === 'retailer') {
     el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Retailer</div>
-      <div class="fg"><label>Shop Name *</label><input id="m-rn" placeholder="e.g. Sharma General Store"></div>
-      <div class="fg"><label>Contact Number</label><input id="m-rc" type="tel" placeholder="98XXXXXXXX"></div>
-      <div class="fg"><label>Area / Location</label><input id="m-ra" placeholder="e.g. Main Market, Hazaribagh"></div>
+      <div class="fg"><label>Shop Name *</label><input id="m-rn" placeholder="e.g. Sharma Store"></div>
+      <div class="fg"><label>Contact</label><input id="m-rc" type="tel"></div>
+      <div class="fg"><label>Area</label><input id="m-ra"></div>
       <button class="btn btn-or" onclick="addRetailer()">Add Retailer</button></div>`;
   } else if (type === 'salesman') {
     el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Salesman</div>
-      <div class="fg"><label>Salesman Name *</label><input id="m-sn" placeholder="Full name"></div>
+      <div class="fg"><label>Name *</label><input id="m-sn"></div>
       <button class="btn btn-or" onclick="addSalesman()">Add Salesman</button></div>`;
   }
 }
 
+function handleImageUpload(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 300; let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } }
+      else { if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+      const b64 = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('m-pimg-b64').value = b64;
+      document.getElementById('img-preview').src = b64;
+      document.getElementById('img-preview-container').style.display = 'block';
+    }
+    img.src = e.target.result;
+  }
+  reader.readAsDataURL(file);
+}
+
 async function addCompany() {
-  const name = document.getElementById('m-cn').value.trim();
-  if (!name) { toast('Enter company name'); return; }
+  const name = document.getElementById('m-cn').value.trim(); if (!name) return;
   const { error } = await db.from('companies').insert({name});
-  if (error) { toast('❌ '+error.message); return; }
-  toast('✅ Company added'); document.getElementById('m-cn').value = '';
+  if (error) toast('❌ '+error.message); else { toast('✅ Added'); document.getElementById('m-cn').value = ''; }
   const {data} = await db.from('companies').select('*').order('name'); S.companies = data||[];
 }
 
 async function addProduct() {
-  const company_id = document.getElementById('m-pcmp').value;
+  const comp = document.getElementById('m-pcmp').value;
   const name = document.getElementById('m-pn').value.trim();
   const sku = document.getElementById('m-psku').value.trim();
-  if (!name || !sku) { toast('Name and SKU are required'); return; }
+  if (!name || !sku) return toast('Name & SKU required');
   const { error } = await db.from('products').insert({
-    company_id, name, sku,
+    company_id: comp, name, sku,
     category: document.getElementById('m-pcat').value.trim()||null,
     pack_size: document.getElementById('m-psz').value.trim()||null,
     mrp: parseFloat(document.getElementById('m-pmrp').value)||null,
     rate: parseFloat(document.getElementById('m-prate').value)||0,
-    image_url: document.getElementById('m-pimg').value.trim()||null,
+    image_url: document.getElementById('m-pimg-b64').value || null,
     notes: document.getElementById('m-pnt').value.trim()||null,
   });
-  if (error) { toast('❌ '+error.message); return; }
-  toast('✅ Product added');
-  ['m-pn','m-psku','m-pmrp','m-prate','m-pimg'].forEach(id => {
-    if(document.getElementById(id)) document.getElementById(id).value = '';
-  });
+  if (error) toast('❌ '+error.message); else {
+    toast('✅ Added');
+    ['m-pn','m-psku','m-pmrp','m-prate','m-pimg-b64','m-pimg-file'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
+    document.getElementById('img-preview-container').style.display = 'none';
+  }
 }
 
 async function addRetailer() {
-  const name = document.getElementById('m-rn').value.trim();
-  if (!name) { toast('Shop name required'); return; }
+  const name = document.getElementById('m-rn').value.trim(); if (!name) return;
   const { error } = await db.from('retailers').insert({
     name, contact: document.getElementById('m-rc').value.trim()||null, area: document.getElementById('m-ra').value.trim()||null
   });
-  if (error) { toast('❌ '+error.message); return; }
-  toast('✅ Retailer added');
-  ['m-rn','m-rc','m-ra'].forEach(id => document.getElementById(id).value = '');
-  if (S.salesman) loadRetailers();
+  if (error) toast('❌ '+error.message); else { toast('✅ Added'); loadRetailers(); }
 }
 
 async function addSalesman() {
-  const name = document.getElementById('m-sn').value.trim();
-  if (!name) { toast('Enter name'); return; }
+  const name = document.getElementById('m-sn').value.trim(); if (!name) return;
   const { error } = await db.from('salesmen').insert({name});
-  if (error) { toast('❌ '+error.message); return; }
-  toast('✅ Salesman added'); document.getElementById('m-sn').value = '';
+  if (error) toast('❌ '+error.message); else { toast('✅ Added'); document.getElementById('m-sn').value = ''; }
 }
 
-// ===================== HELPERS =====================
 function escQ(s) { return (s||'').replace(/'/g, "\\'"); }
 </script>
 </body>
