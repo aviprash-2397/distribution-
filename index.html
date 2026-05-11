@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>DistribHub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#f97316;--or2:#ea580c;--bg:#f8fafc;--wh:#fff;--tx:#1e293b;--mu:#64748b;--bd:#e2e8f0;--gr:#22c55e}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.pg{display:none;min-height:100vh;flex-direction:column}
+.pg.active{display:flex}
+.hd{background:var(--or);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;flex-shrink:0}
+.hd h2{font-size:17px;font-weight:600;flex:1}
+.hd-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.hd-btn{background:rgba(255,255,255,.2);border:none;color:#fff;font-size:13px;padding:6px 12px;border-radius:8px;cursor:pointer}
+.ct{flex:1;padding:16px;max-width:520px;margin:0 auto;width:100%;overflow-y:auto}
+.card{background:var(--wh);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.07);border:1px solid var(--bd)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;border:none;width:100%;transition:.15s;font-family:inherit}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-or{background:var(--or);color:#fff}.btn-or:hover:not(:disabled){background:var(--or2)}
+.btn-gr{background:#dcfce7;color:#166534}
+.btn-wa{background:#25D366;color:#fff}
+.btn-ghost{background:var(--bd);color:var(--tx)}
+.btn-outline{background:#fff;border:1px solid var(--bd);color:var(--tx)}
+.btn-sm{padding:7px 13px;font-size:13px;width:auto;border-radius:8px}
+.fg{margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:500;color:var(--mu);margin-bottom:5px}
+input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--bd);border-radius:10px;font-size:15px;background:#fff;color:var(--tx);outline:none;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--or)}
+textarea{resize:none;height:70px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500}
+.b-placed{background:#fef9c3;color:#854d0e}.b-done{background:#dcfce7;color:#166534}
+.b-paid{background:#dcfce7;color:#166534}.b-unpaid{background:#fee2e2;color:#991b1b}
+.b-cash{background:#e0f2fe;color:#075985}.b-credit{background:#fce7f3;color:#9d174d}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cc{background:var(--wh);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;border:1px solid var(--bd);box-shadow:0 1px 3px rgba(0,0,0,.07);transition:.15s}
+.cc:hover{border-color:var(--or)}
+.ci{width:52px;height:52px;background:var(--or);color:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;margin:0 auto 10px}
+.cn{font-size:14px;font-weight:500}
+.pr{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bd);gap:8px}
+.pr:last-child{border-bottom:none}
+.pn{font-size:14px;font-weight:500}.ps{font-size:12px;color:var(--mu);margin-top:2px}
+.qc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.qb{width:28px;height:28px;border-radius:7px;border:1px solid var(--bd);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qi{width:38px;text-align:center;padding:4px;font-size:14px;border:1px solid var(--bd);border-radius:7px}
+.oc{background:var(--wh);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);border:1px solid var(--bd)}
+.oh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.on{font-size:16px;font-weight:600}.om{font-size:12px;color:var(--mu);margin-top:3px}
+.of{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sc{background:var(--wh);border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.sv{font-size:26px;font-weight:700;color:var(--or)}.sl{font-size:12px;color:var(--mu);margin-top:3px}
+.tb{display:flex;background:var(--wh);border-bottom:1px solid var(--bd);position:sticky;top:53px;z-index:9;flex-shrink:0}
+.tab{flex:1;padding:11px 4px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent}
+.tab.active{color:var(--or);border-bottom-color:var(--or)}
+.sb{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:9px 14px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.sb input{border:none;outline:none;flex:1;font-size:15px;background:transparent}
+.land{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#fff7ed,#fff)}
+.ll{width:72px;height:72px;background:var(--or);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:18px}
+.lt{font-size:26px;font-weight:700;margin-bottom:4px}.ls{color:var(--mu);margin-bottom:40px;font-size:15px}
+.rc{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px}
+.rcard{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:18px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.15s}
+.rcard:hover{border-color:var(--or);transform:translateY(-1px)}
+.ri{font-size:28px}.rt{font-size:16px;font-weight:600}.rd{font-size:13px;color:var(--mu);margin-top:2px}
+.empty{text-align:center;padding:40px 16px;color:var(--mu)}.ei{font-size:44px;margin-bottom:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;padding:9px 8px;color:var(--mu);font-weight:500;border-bottom:1px solid var(--bd);font-size:12px;text-transform:uppercase}
+.tbl td{padding:9px 8px;border-bottom:1px solid var(--bd)}
+.load{text-align:center;padding:30px;color:var(--mu)}
+.cart-bar{background:var(--or);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.dv{height:1px;background:var(--bd);margin:14px 0}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;z-index:9999;display:none;white-space:nowrap;pointer-events:none}
+.ss-item{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:10px;transition:.15s}
+.ss-item:hover{border-color:var(--or)}
+.ss-av{width:40px;height:40px;background:var(--or);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0}
+.oi-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:var(--mu)}
+.fc{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid var(--bd);background:#fff;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.chip.active{background:var(--or);color:#fff;border-color:var(--or)}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- LANDING -->
+<div id="pg-landing" class="pg active">
+  <div class="land">
+    <div class="ll">📦</div>
+    <h1 class="lt">DistribHub</h1>
+    <p class="ls">Wholesale Order Management</p>
+    <div class="rc">
+      <div class="rcard" onclick="gotoPage('pg-salesman-select')">
+        <div class="ri">🛵</div>
+        <div><div class="rt">Salesman</div><div class="rd">Place &amp; track orders</div></div>
+      </div>
+      <div class="rcard" onclick="gotoPage('pg-admin-login')">
+        <div class="ri">📊</div>
+        <div><div class="rt">Admin</div><div class="rd">Dashboard &amp; reports</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SALESMAN SELECT -->
+<div id="pg-salesman-select" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-landing')">←</button>
+    <h2>Who are you?</h2>
+  </div>
+  <div class="ct"><div id="salesman-list"><div class="load">Loading...</div></div></div>
+</div>
+
+<!-- SALESMAN HOME -->
+<div id="pg-home" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="salesmanLogout()">←</button>
+    <h2 id="home-title">Dashboard</h2>
+    <button class="hd-btn" onclick="openNewOrder()">🛒 New Order</button>
+  </div>
+  <div class="tb">
+    <div class="tab active" onclick="switchHomeTab('catalog',this)">📦 Catalog</div>
+    <div class="tab" onclick="switchHomeTab('history',this)">📋 My Orders</div>
+  </div>
+  <div id="tab-catalog" class="ct">
+    <div id="company-grid" class="cg"><div class="load">Loading...</div></div>
+  </div>
+  <div id="tab-history" class="ct" style="display:none">
+    <div id="salesman-orders"><div class="load">Loading...</div></div>
+  </div>
+</div>
+
+<!-- COMPANY PRODUCTS (catalog view only) -->
+<div id="pg-company" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-home')">←</button>
+    <h2 id="company-title">Products</h2>
+  </div>
+  <div class="ct">
+    <div class="sb"><span>🔍</span><input id="product-search" type="text" placeholder="Search product or SKU..." oninput="filterCatalog()"></div>
+    <div id="product-list"><div class="load">Loading...</div></div>
+  </div>
+</div>
+
+<!-- NEW / EDIT ORDER -->
+<div id="pg-new-order" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-home')">←</button>
+    <h2 id="order-form-title">New Order</h2>
+  </div>
+  <div class="ct">
+    <div id="cart-items"></div>
+    <button class="btn btn-outline" onclick="gotoPage('pg-company-picker')" style="margin-bottom:14px">+ Add Products from Catalog</button>
+    <div class="dv"></div>
+    <div class="fg"><label>Retailer *</label><select id="f-retailer"><option value="">Select retailer...</option></select></div>
+    <div class="fg"><label>Payment Terms *</label>
+      <select id="f-payment" onchange="toggleCredit()"><option value="cash">Cash</option><option value="credit">Credit</option></select>
+    </div>
+    <div class="fg" id="credit-wrap" style="display:none"><label>Credit Period</label>
+      <select id="f-credit"><option value="7">7 days</option><option value="15">15 days</option><option value="30">30 days</option><option value="45">45 days</option><option value="60">60 days</option></select>
+    </div>
+    <div class="fg"><label>Delivery Date</label><input type="date" id="f-delivery"></div>
+    <div class="fg"><label>Notes</label><textarea id="f-notes" placeholder="Special instructions..."></textarea></div>
+    <button class="btn btn-or" id="place-btn" onclick="placeOrder()">✅ Place Order</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- COMPANY PICKER (for order cart) -->
+<div id="pg-company-picker" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-new-order')">←</button>
+    <h2>Select Company</h2>
+  </div>
+  <div class="ct"><div id="picker-company-grid" class="cg"><div class="load">Loading...</div></div></div>
+</div>
+
+<!-- PRODUCT PICKER (for order cart) -->
+<div id="pg-product-picker" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-company-picker')">←</button>
+    <h2 id="picker-title">Pick Products</h2>
+  </div>
+  <div class="ct" style="padding-bottom:0">
+    <div class="sb"><span>🔍</span><input id="picker-search" type="text" placeholder="Search..." oninput="filterPicker()"></div>
+    <div id="picker-list"></div>
+  </div>
+  <div class="cart-bar">
+    <span id="cart-label">0 items in cart</span>
+    <button class="btn btn-or btn-sm" onclick="gotoPage('pg-new-order')">Done ✓</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="pg-admin-login" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-landing')">←</button>
+    <h2>Admin Login</h2>
+  </div>
+  <div class="ct" style="padding-top:40px">
+    <div class="card">
+      <div class="fg"><label>Password</label><input type="password" id="admin-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <button class="btn btn-or" onclick="adminLogin()">Login →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="pg-admin" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="adminLogout()">←</button>
+    <h2>Admin Dashboard</h2>
+  </div>
+  <div class="tb">
+    <div class="tab active" onclick="switchAdminTab('orders',this)">Orders</div>
+    <div class="tab" onclick="switchAdminTab('reports',this)">Reports</div>
+    <div class="tab" onclick="switchAdminTab('manage',this)">Manage</div>
+  </div>
+  <div id="at-orders" class="ct">
+    <div id="admin-stats" class="sg"></div>
+    <div class="fc" id="order-filters">
+      <div class="chip active" onclick="filterOrders('all',this)">All</div>
+      <div class="chip" onclick="filterOrders('placed',this)">Pending</div>
+      <div class="chip" onclick="filterOrders('done',this)">Done</div>
+      <div class="chip" onclick="filterOrders('unpaid',this)">Unpaid</div>
+    </div>
+    <div id="admin-orders-list"><div class="load">Loading...</div></div>
+  </div>
+  <div id="at-reports" class="ct" style="display:none"><div id="reports-content"><div class="load">Loading...</div></div></div>
+  <div id="at-manage" class="ct" style="display:none"><div id="manage-content"></div></div>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+const SUPABASE_URL = 'https://icboixkgnqkprljbledd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljYm9peGtnbnFrcHJsamJsZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MTgyNzIsImV4cCI6MjA5NDA5NDI3Mn0.4dg7sy_kMU2EJlqN1qzNodPAsb2VRLJBCGVtU5cgWl4';
+const ADMIN_PASSWORD = 'admin123'; // ⚠️ CHANGE THIS
+const FATHER_WHATSAPP = '91XXXXXXXXXX'; // ⚠️ CHANGE TO FATHER'S NUMBER e.g. '919876543210'
+
+// ===================== DB =====================
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===================== STATE =====================
+const S = {
+  salesman: null,
+  cart: [],
+  editingOrderId: null,
+  catalogProducts: [],
+  pickerProducts: [],
+  companies: [],
+  retailers: [],
+  adminOrders: [],
+};
+
+// ===================== UTILS =====================
+function toast(msg, dur=2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', dur);
+}
+function fmtDate(d) {
+  if (!d) return '-';
+  return new Date(d).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+}
+function fmtOrder(n) { return 'ORD-' + String(n).padStart(4,'0'); }
+
+function gotoPage(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 'pg-salesman-select') loadSalesmenList();
+  if (id === 'pg-company-picker') renderPickerCompanies();
+  if (id === 'pg-new-order') { renderCart(); refreshRetailerDropdown(); }
+}
+
+// ===================== SALESMAN SELECT =====================
+async function loadSalesmenList() {
+  const el = document.getElementById('salesman-list');
+  const { data } = await db.from('salesmen').select('*').neq('name','Admin').order('name');
+  if (!data?.length) { el.innerHTML = '<div class="empty"><div class="ei">👤</div>No salesmen found.<br>Add them in Admin → Manage.</div>'; return; }
+  el.innerHTML = data.map(s => `
+    <div class="ss-item" onclick="selectSalesman('${s.id}','${escQ(s.name)}')">
+      <div class="ss-av">${s.name[0].toUpperCase()}</div>
+      <div><div style="font-weight:500">${s.name}</div><div style="font-size:12px;color:var(--mu)">Tap to continue</div></div>
+    </div>`).join('');
+}
+
+async function selectSalesman(id, name) {
+  S.salesman = { id, name };
+  document.getElementById('home-title').textContent = name + "'s Dashboard";
+  gotoPage('pg-home');
+  loadCompanies();
+  loadRetailers();
+}
+
+function salesmanLogout() {
+  S.salesman = null; S.cart = []; S.editingOrderId = null;
+  gotoPage('pg-landing');
+}
+
+// ===================== HOME TABS =====================
+function switchHomeTab(tab, el) {
+  document.querySelectorAll('#pg-home .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-catalog').style.display = tab === 'catalog' ? 'block' : 'none';
+  document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none';
+  if (tab === 'history') loadSalesmanOrders();
+}
+
+// ===================== CATALOG =====================
+async function loadCompanies() {
+  const { data } = await db.from('companies').select('*').order('name');
+  S.companies = data || [];
+  renderCompanyGrid('company-grid', 'openCompanyCatalog');
+}
+
+function renderCompanyGrid(gridId, fn) {
+  const el = document.getElementById(gridId);
+  if (!S.companies.length) {
+    el.innerHTML = '<div style="grid-column:1/-1"><div class="empty"><div class="ei">🏭</div>No companies yet.<br>Add in Admin → Manage.</div></div>';
+    return;
+  }
+  el.innerHTML = S.companies.map(c => `
+    <div class="cc" onclick="${fn}('${c.id}','${escQ(c.name)}')">
+      <div class="ci">${c.name[0].toUpperCase()}</div>
+      <div class="cn">${c.name}</div>
+    </div>`).join('');
+}
+
+function renderPickerCompanies() {
+  if (S.companies.length) { renderCompanyGrid('picker-company-grid','openCompanyPicker'); return; }
+  db.from('companies').select('*').order('name').then(({data}) => {
+    S.companies = data || [];
+    renderCompanyGrid('picker-company-grid','openCompanyPicker');
+  });
+}
+
+async function openCompanyCatalog(id, name) {
+  document.getElementById('company-title').textContent = name;
+  gotoPage('pg-company');
+  document.getElementById('product-search').value = '';
+  const el = document.getElementById('product-list');
+  el.innerHTML = '<div class="load">Loading...</div>';
+  const { data } = await db.from('products').select('*').eq('company_id', id).eq('is_active', true).order('name');
+  S.catalogProducts = data || [];
+  renderCatalogList(S.catalogProducts);
+}
+
+function renderCatalogList(products) {
+  const el = document.getElementById('product-list');
+  if (!products.length) { el.innerHTML = '<div class="empty"><div class="ei">📦</div>No products found.</div>'; return; }
+  el.innerHTML = `<div class="card" style="padding:8px 16px">` +
+    products.map(p => `
+      <div class="pr">
+        <div><div class="pn">${p.name}</div>
+        <div class="ps">${p.sku}${p.pack_size ? ' · '+p.pack_size : ''}${p.mrp ? ' · ₹'+p.mrp : ''}</div></div>
+      </div>`).join('') + `</div>`;
+}
+
+function filterCatalog() {
+  const q = document.getElementById('product-search').value.toLowerCase();
+  renderCatalogList(S.catalogProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
+}
+
+// ===================== CART & PICKER =====================
+async function openCompanyPicker(id, name) {
+  document.getElementById('picker-title').textContent = name;
+  document.getElementById('picker-search').value = '';
+  gotoPage('pg-product-picker');
+  const el = document.getElementById('picker-list');
+  el.innerHTML = '<div class="load">Loading...</div>';
+  const { data } = await db.from('products').select('*').eq('company_id', id).eq('is_active', true).order('name');
+  S.pickerProducts = (data || []).map(p => ({...p, company_name: name}));
+  renderPickerList(S.pickerProducts);
+}
+
+function renderPickerList(products) {
+  const el = document.getElementById('picker-list');
+  if (!products.length) { el.innerHTML = '<div class="empty"><div class="ei">📦</div>No products.</div>'; return; }
+  el.innerHTML = `<div class="card" style="padding:8px 16px">` +
+    products.map(p => {
+      const qty = S.cart.find(c => c.pid === p.id)?.qty || 0;
+      return `<div class="pr">
+        <div style="flex:1;min-width:0"><div class="pn" style="word-break:break-word">${p.name}</div><div class="ps">${p.sku}${p.pack_size ? ' · '+p.pack_size : ''}</div></div>
+        <div class="qc">
+          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',-1)">−</button>
+          <input class="qi" id="qi-${p.id}" value="${qty}" type="number" min="0" onchange="setQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',this.value)">
+          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',1)">+</button>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+  updateCartLabel();
+}
+
+function filterPicker() {
+  const q = document.getElementById('picker-search').value.toLowerCase();
+  renderPickerList(S.pickerProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
+}
+
+function adjQty(pid, name, sku, company, delta) {
+  const inp = document.getElementById('qi-'+pid);
+  let qty = parseInt(inp?.value || 0) + delta;
+  if (qty < 0) qty = 0;
+  if (inp) inp.value = qty;
+  upsertCart(pid, name, sku, company, qty);
+}
+
+function setQty(pid, name, sku, company, val) {
+  upsertCart(pid, name, sku, company, Math.max(0, parseInt(val)||0));
+}
+
+function upsertCart(pid, name, sku, company, qty) {
+  const idx = S.cart.findIndex(c => c.pid === pid);
+  if (qty <= 0) { if (idx > -1) S.cart.splice(idx, 1); }
+  else if (idx > -1) S.cart[idx].qty = qty;
+  else S.cart.push({pid, name, sku, company, qty});
+  updateCartLabel();
+}
+
+function updateCartLabel() {
+  const total = S.cart.reduce((s,c) => s + c.qty, 0);
+  const el = document.getElementById('cart-label');
+  if (el) el.textContent = total + ' item' + (total !== 1 ? 's' : '') + ' in cart';
+}
+
+// ===================== ORDER FORM =====================
+async function loadRetailers() {
+  const { data } = await db.from('retailers').select('*').order('name');
+  S.retailers = data || [];
+  refreshRetailerDropdown();
+}
+
+function refreshRetailerDropdown() {
+  const sel = document.getElementById('f-retailer');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select retailer...</option>' +
+    S.retailers.map(r => `<option value="${r.id}">${r.name}${r.area ? ' ('+r.area+')' : ''}</option>`).join('');
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-items');
+  if (!el) return;
+  if (!S.cart.length) {
+    el.innerHTML = '<div class="empty" style="padding:20px 0"><div class="ei">🛒</div>No products added yet.</div>';
+    return;
+  }
+  el.innerHTML = `<div class="card" style="padding:8px 16px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:600;color:var(--mu);padding:8px 0 4px">ORDER ITEMS</div>` +
+    S.cart.map(item => `
+      <div class="pr">
+        <div style="flex:1;min-width:0"><div class="pn" style="word-break:break-word">${item.name}</div><div class="ps">${item.sku}${item.company ? ' · '+item.company : ''}</div></div>
+        <div class="qc">
+          <button class="qb" onclick="adjCart('${item.pid}',-1)">−</button>
+          <input class="qi" value="${item.qty}" type="number" min="0" onchange="setCart('${item.pid}',this.value)">
+          <button class="qb" onclick="adjCart('${item.pid}',1)">+</button>
+        </div>
+      </div>`).join('') + `</div>`;
+}
+
+function adjCart(pid, delta) {
+  const item = S.cart.find(c => c.pid === pid);
+  if (!item) return;
+  item.qty = Math.max(0, item.qty + delta);
+  if (item.qty === 0) S.cart = S.cart.filter(c => c.pid !== pid);
+  renderCart();
+}
+
+function setCart(pid, val) {
+  const item = S.cart.find(c => c.pid === pid);
+  if (!item) return;
+  item.qty = Math.max(0, parseInt(val)||0);
+  if (item.qty === 0) S.cart = S.cart.filter(c => c.pid !== pid);
+  renderCart();
+}
+
+function toggleCredit() {
+  const v = document.getElementById('f-payment').value;
+  document.getElementById('credit-wrap').style.display = v === 'credit' ? 'block' : 'none';
+}
+
+function openNewOrder() {
+  S.editingOrderId = null; S.cart = [];
+  document.getElementById('order-form-title').textContent = 'New Order';
+  document.getElementById('place-btn').textContent = '✅ Place Order';
+  document.getElementById('f-payment').value = 'cash';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-delivery').value = '';
+  document.getElementById('credit-wrap').style.display = 'none';
+  gotoPage('pg-new-order');
+}
+
+async function placeOrder() {
+  if (!S.cart.length) { toast('⚠️ Add at least one product'); return; }
+  const retailer_id = document.getElementById('f-retailer').value;
+  if (!retailer_id) { toast('⚠️ Select a retailer'); return; }
+  const payment_term = document.getElementById('f-payment').value;
+  const credit_period_days = payment_term === 'credit' ? parseInt(document.getElementById('f-credit').value) : null;
+  const delivery_date = document.getElementById('f-delivery').value || null;
+  const notes = document.getElementById('f-notes').value.trim() || null;
+
+  const btn = document.getElementById('place-btn');
+  btn.textContent = '⏳ Saving...'; btn.disabled = true;
+
+  try {
+    let orderId;
+    if (S.editingOrderId) {
+      await db.from('orders').update({ retailer_id, payment_term, credit_period_days, delivery_date, notes }).eq('id', S.editingOrderId);
+      await db.from('order_items').delete().eq('order_id', S.editingOrderId);
+      orderId = S.editingOrderId;
+    } else {
+      const { data: ord, error } = await db.from('orders').insert({
+        salesman_id: S.salesman.id, retailer_id, payment_term, credit_period_days, delivery_date, notes
+      }).select().single();
+      if (error) throw error;
+      orderId = ord.id;
+    }
+
+    await db.from('order_items').insert(S.cart.map(c => ({ order_id: orderId, product_id: c.pid, quantity: c.qty })));
+
+    // Get order number for WhatsApp
+    const { data: ord2 } = await db.from('orders').select('order_number').eq('id', orderId).single();
+    const retailerName = S.retailers.find(r => r.id === retailer_id)?.name || '';
+    const itemLines = S.cart.map(c => `• ${c.name} (${c.sku}) x ${c.qty}`).join('\n');
+    const isEdit = !!S.editingOrderId;
+    const msg = encodeURIComponent(
+      `📦 *${isEdit ? 'UPDATED' : 'NEW'} ORDER — ${fmtOrder(ord2?.order_number||0)}*\n` +
+      `👤 Salesman: ${S.salesman.name}\n` +
+      `🏪 Retailer: ${retailerName}\n` +
+      `📅 Date: ${fmtDate(new Date().toISOString())}\n` +
+      (delivery_date ? `🚚 Deliver by: ${fmtDate(delivery_date)}\n` : '') +
+      `\n*Items:*\n${itemLines}\n\n` +
+      `💳 Payment: ${payment_term === 'cash' ? 'Cash' : 'Credit (' + credit_period_days + ' days)'}\n` +
+      (notes ? `📝 Notes: ${notes}\n` : '') +
+      `\n✅ Sent via DistribHub`
+    );
+
+    S.cart = []; S.editingOrderId = null;
+    toast('✅ Order saved!');
+    setTimeout(() => {
+      window.open(`https://wa.me/${FATHER_WHATSAPP}?text=${msg}`, '_blank');
+      gotoPage('pg-home');
+      switchHomeTab('history', document.querySelectorAll('#pg-home .tab')[1]);
+    }, 600);
+  } catch(e) {
+    toast('❌ Error: ' + e.message);
+    btn.textContent = S.editingOrderId ? '✅ Update Order' : '✅ Place Order';
+    btn.disabled = false;
+  }
+}
+
+// ===================== SALESMAN ORDER HISTORY =====================
+async function loadSalesmanOrders() {
+  if (!S.salesman) return;
+  const el = document.getElementById('salesman-orders');
+  el.innerHTML = '<div class="load">Loading...</div>';
+  const { data } = await db.from('orders')
+    .select('*, retailers(name), order_items(quantity, products(name,sku)), payments(status)')
+    .eq('salesman_id', S.salesman.id)
+    .order('created_at', {ascending: false});
+  if (!data?.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div>No orders placed yet.</div>'; return; }
+  el.innerHTML = data.map(o => `
+    <div class="oc">
+      <div class="oh">
+        <div><div class="on">${fmtOrder(o.order_number)}</div>
+        <div class="om">${o.retailers?.name || '-'} · ${fmtDate(o.order_date)}</div></div>
+        <span class="badge b-${o.status}">${o.status === 'placed' ? 'Pending' : 'Done'}</span>
+      </div>
+      <div>${(o.order_items||[]).map(i => `<div class="oi-row"><span>${i.products?.name}</span><span>${i.quantity} pcs</span></div>`).join('')}</div>
+      <div class="of">
+        <span class="badge b-${o.payment_term}">${o.payment_term}</span>
+        <span class="badge b-${o.payments?.[0]?.status||'unpaid'}">${o.payments?.[0]?.status === 'paid' ? '💚 Paid' : '🔴 Unpaid'}</span>
+        ${o.status === 'placed' ? `<button class="btn btn-ghost btn-sm" onclick="editOrder('${o.id}')">✏️ Edit</button>` : ''}
+        <button class="btn btn-wa btn-sm" onclick="resendWhatsApp('${o.id}')">📲 WhatsApp</button>
+      </div>
+    </div>`).join('');
+}
+
+async function editOrder(orderId) {
+  const { data: o } = await db.from('orders')
+    .select('*, retailers(id,name), order_items(quantity, product_id, products(name,sku))')
+    .eq('id', orderId).single();
+  if (!o) return;
+  S.editingOrderId = orderId;
+  S.cart = o.order_items.map(i => ({ pid: i.product_id, name: i.products?.name||'', sku: i.products?.sku||'', company:'', qty: i.quantity }));
+  document.getElementById('order-form-title').textContent = 'Edit Order';
+  document.getElementById('f-payment').value = o.payment_term;
+  toggleCredit();
+  if (o.credit_period_days) document.getElementById('f-credit').value = o.credit_period_days;
+  document.getElementById('f-delivery').value = o.delivery_date || '';
+  document.getElementById('f-notes').value = o.notes || '';
+  document.getElementById('place-btn').textContent = '✅ Update Order';
+  gotoPage('pg-new-order');
+  setTimeout(() => { document.getElementById('f-retailer').value = o.retailer_id || ''; }, 100);
+}
+
+async function resendWhatsApp(orderId) {
+  const { data: o } = await db.from('orders')
+    .select('*, retailers(name), salesmen(name), order_items(quantity, products(name,sku))')
+    .eq('id', orderId).single();
+  if (!o) return;
+  const itemLines = (o.order_items||[]).map(i => `• ${i.products?.name} (${i.products?.sku}) x ${i.quantity}`).join('\n');
+  const msg = encodeURIComponent(
+    `📦 *Order ${fmtOrder(o.order_number)}*\n👤 ${o.salesmen?.name}\n🏪 ${o.retailers?.name}\n📅 ${fmtDate(o.order_date)}\n\n*Items:*\n${itemLines}\n\n💳 ${o.payment_term === 'cash' ? 'Cash' : 'Credit ('+o.credit_period_days+'d)'}${o.notes ? '\n📝 '+o.notes : ''}`
+  );
+  window.open(`https://wa.me/${FATHER_WHATSAPP}?text=${msg}`, '_blank');
+}
+
+// ===================== ADMIN =====================
+function adminLogin() {
+  if (document.getElementById('admin-pw').value === ADMIN_PASSWORD) {
+    gotoPage('pg-admin');
+    loadAdminDashboard();
+  } else { toast('❌ Wrong password'); }
+}
+
+function adminLogout() {
+  document.getElementById('admin-pw').value = '';
+  gotoPage('pg-landing');
+}
+
+async function loadAdminDashboard() {
+  await Promise.all([loadAdminOrders(), loadAdminStats()]);
+}
+
+async function loadAdminStats() {
+  const today = new Date().toISOString().split('T')[0];
+  const [{ data: t }, { data: p }, { data: all }, { data: u }] = await Promise.all([
+    db.from('orders').select('id').eq('order_date', today),
+    db.from('orders').select('id').eq('status','placed'),
+    db.from('orders').select('id'),
+    db.from('payments').select('id').eq('status','unpaid'),
+  ]);
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="sc"><div class="sv">${t?.length||0}</div><div class="sl">Orders Today</div></div>
+    <div class="sc"><div class="sv">${p?.length||0}</div><div class="sl">Pending</div></div>
+    <div class="sc"><div class="sv">${u?.length||0}</div><div class="sl">Unpaid</div></div>
+    <div class="sc"><div class="sv">${all?.length||0}</div><div class="sl">Total Orders</div></div>`;
+}
+
+async function loadAdminOrders() {
+  const { data } = await db.from('orders')
+    .select('*, retailers(name), salesmen(name), order_items(quantity, products(name,sku)), payments(id,status)')
+    .order('created_at', {ascending:false});
+  S.adminOrders = data || [];
+  renderAdminOrders(S.adminOrders);
+}
+
+function filterOrders(filter, el) {
+  document.querySelectorAll('#order-filters .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (filter === 'all') renderAdminOrders(S.adminOrders);
+  else if (filter === 'placed') renderAdminOrders(S.adminOrders.filter(o => o.status === 'placed'));
+  else if (filter === 'done') renderAdminOrders(S.adminOrders.filter(o => o.status === 'done'));
+  else if (filter === 'unpaid') renderAdminOrders(S.adminOrders.filter(o => o.payments?.[0]?.status !== 'paid'));
+}
+
+function renderAdminOrders(orders) {
+  const el = document.getElementById('admin-orders-list');
+  if (!orders.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div>No orders found.</div>'; return; }
+  el.innerHTML = orders.map(o => `
+    <div class="oc">
+      <div class="oh">
+        <div><div class="on">${fmtOrder(o.order_number)}</div>
+        <div class="om">👤 ${o.salesmen?.name} → 🏪 ${o.retailers?.name||'-'}</div>
+        <div class="om">${fmtDate(o.order_date)}${o.delivery_date ? ' · Deliver: '+fmtDate(o.delivery_date) : ''}</div></div>
+        <span class="badge b-${o.status}">${o.status === 'placed' ? 'Pending' : 'Done'}</span>
+      </div>
+      <div>${(o.order_items||[]).map(i => `<div class="oi-row"><span>${i.products?.name}</span><span>${i.quantity} pcs</span></div>`).join('')}</div>
+      ${o.notes ? `<div style="font-size:13px;color:var(--mu);margin-top:6px">📝 ${o.notes}</div>` : ''}
+      <div class="of">
+        <span class="badge b-${o.payment_term}">${o.payment_term}${o.payment_term==='credit' ? ' ('+o.credit_period_days+'d)':''}</span>
+        <span class="badge b-${o.payments?.[0]?.status||'unpaid'}">${o.payments?.[0]?.status==='paid' ? '💚 Paid':'🔴 Unpaid'}</span>
+        ${o.status==='placed' ? `<button class="btn btn-gr btn-sm" onclick="markDone('${o.id}')">✅ Done</button>` : ''}
+        ${o.payments?.[0]?.status!=='paid' ? `<button class="btn btn-or btn-sm" onclick="markPaid('${o.payments?.[0]?.id}')">💰 Paid</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function markDone(orderId) {
+  await db.from('orders').update({status:'done'}).eq('id', orderId);
+  toast('✅ Marked as done'); loadAdminDashboard();
+}
+
+async function markPaid(paymentId) {
+  await db.from('payments').update({status:'paid', paid_on: new Date().toISOString().split('T')[0]}).eq('id', paymentId);
+  toast('💰 Payment marked as paid'); loadAdminDashboard();
+}
+
+// ===================== ADMIN TABS =====================
+function switchAdminTab(tab, el) {
+  document.querySelectorAll('#pg-admin .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('at-orders').style.display = tab==='orders' ? 'block':'none';
+  document.getElementById('at-reports').style.display = tab==='reports' ? 'block':'none';
+  document.getElementById('at-manage').style.display = tab==='manage' ? 'block':'none';
+  if (tab === 'reports') loadReports();
+  if (tab === 'manage') loadManage();
+}
+
+// ===================== REPORTS =====================
+async function loadReports() {
+  const el = document.getElementById('reports-content');
+  el.innerHTML = '<div class="load">Loading...</div>';
+  const { data } = await db.from('orders')
+    .select('order_date, salesmen(name), retailers(name), payments(status)')
+    .order('order_date', {ascending:false});
+  if (!data?.length) { el.innerHTML = '<div class="empty"><div class="ei">📊</div>No data yet.</div>'; return; }
+
+  // Last 7 days
+  const days = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days[d.toISOString().split('T')[0]] = 0;
+  }
+  data.forEach(o => { if (o.order_date in days) days[o.order_date]++; });
+  const maxD = Math.max(...Object.values(days), 1);
+
+  // By salesman
+  const bySM = {};
+  data.forEach(o => { const n = o.salesmen?.name||'?'; bySM[n] = (bySM[n]||0)+1; });
+
+  // By retailer
+  const byRT = {};
+  data.forEach(o => { const n = o.retailers?.name||'?'; byRT[n] = (byRT[n]||0)+1; });
+
+  const unpaid = data.filter(o => o.payments?.[0]?.status !== 'paid').length;
+
+  el.innerHTML = `
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:14px">📅 Orders — Last 7 Days</div>
+      <div style="display:flex;align-items:flex-end;gap:5px;height:90px">
+        ${Object.entries(days).map(([d,v]) => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="font-size:11px;font-weight:600;color:var(--or)">${v||''}</div>
+            <div style="width:100%;background:var(--or);border-radius:4px 4px 0 0;height:${Math.max((v/maxD)*65,v>0?5:0)}px;opacity:.85"></div>
+            <div style="font-size:10px;color:var(--mu)">${new Date(d+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short'})}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:10px">👤 By Salesman</div>
+      <table class="tbl"><thead><tr><th>Name</th><th>Orders</th></tr></thead><tbody>
+        ${Object.entries(bySM).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<tr><td>${n}</td><td><strong>${c}</strong></td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:10px">🏪 By Retailer</div>
+      <table class="tbl"><thead><tr><th>Retailer</th><th>Orders</th></tr></thead><tbody>
+        ${Object.entries(byRT).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`<tr><td>${n}</td><td><strong>${c}</strong></td></tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:4px">💰 Payment Overview</div>
+      <div style="font-size:14px;color:var(--mu)">${unpaid} unpaid order${unpaid!==1?'s':''} out of ${data.length} total</div>
+    </div>`;
+}
+
+// ===================== MANAGE =====================
+function loadManage() {
+  document.getElementById('manage-content').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <button class="btn btn-or" onclick="showForm('company')">🏭 Add Company</button>
+      <button class="btn btn-or" onclick="showForm('product')">📦 Add Product</button>
+      <button class="btn btn-or" onclick="showForm('retailer')">🏪 Add Retailer</button>
+      <button class="btn btn-ghost" onclick="showForm('salesman')">👤 Add Salesman</button>
+    </div>
+    <div id="manage-form"></div>`;
+}
+
+async function showForm(type) {
+  const el = document.getElementById('manage-form');
+  if (type === 'company') {
+    el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Company</div>
+      <div class="fg"><label>Company Name *</label><input id="m-cn" placeholder="e.g. HUL, ITC, P&G"></div>
+      <button class="btn btn-or" onclick="addCompany()">Add Company</button></div>`;
+  } else if (type === 'product') {
+    // Load companies first
+    if (!S.companies.length) { const {data} = await db.from('companies').select('*').order('name'); S.companies = data||[]; }
+    el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Product</div>
+      <div class="fg"><label>Company *</label><select id="m-pcmp">${S.companies.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>Product Name *</label><input id="m-pn" placeholder="e.g. Surf Excel 1kg"></div>
+      <div class="fg"><label>SKU Code *</label><input id="m-psku" placeholder="e.g. HUL-SE-1KG"></div>
+      <div class="fg"><label>Category</label><input id="m-pcat" placeholder="e.g. Detergent, Beverages"></div>
+      <div class="fg"><label>Pack Size</label><input id="m-psz" placeholder="e.g. 1kg, 500ml, 12pcs"></div>
+      <div class="fg"><label>MRP (₹)</label><input id="m-pmrp" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="fg"><label>Notes</label><input id="m-pnt" placeholder="Optional"></div>
+      <button class="btn btn-or" onclick="addProduct()">Add Product</button></div>`;
+  } else if (type === 'retailer') {
+    el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Retailer</div>
+      <div class="fg"><label>Shop Name *</label><input id="m-rn" placeholder="e.g. Sharma General Store"></div>
+      <div class="fg"><label>Contact Number</label><input id="m-rc" type="tel" placeholder="98XXXXXXXX"></div>
+      <div class="fg"><label>Area / Location</label><input id="m-ra" placeholder="e.g. Main Market, Hazaribagh"></div>
+      <button class="btn btn-or" onclick="addRetailer()">Add Retailer</button></div>`;
+  } else if (type === 'salesman') {
+    el.innerHTML = `<div class="card"><div style="font-weight:600;margin-bottom:12px">Add Salesman</div>
+      <div class="fg"><label>Salesman Name *</label><input id="m-sn" placeholder="Full name"></div>
+      <button class="btn btn-or" onclick="addSalesman()">Add Salesman</button></div>`;
+  }
+}
+
+async function addCompany() {
+  const name = document.getElementById('m-cn').value.trim();
+  if (!name) { toast('Enter company name'); return; }
+  const { error } = await db.from('companies').insert({name});
+  if (error) { toast('❌ '+error.message); return; }
+  toast('✅ Company added'); document.getElementById('m-cn').value = '';
+  const {data} = await db.from('companies').select('*').order('name'); S.companies = data||[];
+}
+
+async function addProduct() {
+  const company_id = document.getElementById('m-pcmp').value;
+  const name = document.getElementById('m-pn').value.trim();
+  const sku = document.getElementById('m-psku').value.trim();
+  if (!name || !sku) { toast('Name and SKU are required'); return; }
+  const { error } = await db.from('products').insert({
+    company_id, name, sku,
+    category: document.getElementById('m-pcat').value.trim()||null,
+    pack_size: document.getElementById('m-psz').value.trim()||null,
+    mrp: parseFloat(document.getElementById('m-pmrp').value)||null,
+    notes: document.getElementById('m-pnt').value.trim()||null,
+  });
+  if (error) { toast('❌ '+error.message); return; }
+  toast('✅ Product added');
+  document.getElementById('m-pn').value = '';
+  document.getElementById('m-psku').value = '';
+}
+
+async function addRetailer() {
+  const name = document.getElementById('m-rn').value.trim();
+  if (!name) { toast('Shop name required'); return; }
+  const { error } = await db.from('retailers').insert({
+    name, contact: document.getElementById('m-rc').value.trim()||null, area: document.getElementById('m-ra').value.trim()||null
+  });
+  if (error) { toast('❌ '+error.message); return; }
+  toast('✅ Retailer added');
+  ['m-rn','m-rc','m-ra'].forEach(id => document.getElementById(id).value = '');
+  if (S.salesman) loadRetailers();
+}
+
+async function addSalesman() {
+  const name = document.getElementById('m-sn').value.trim();
+  if (!name) { toast('Enter name'); return; }
+  const { error } = await db.from('salesmen').insert({name});
+  if (error) { toast('❌ '+error.message); return; }
+  toast('✅ Salesman added'); document.getElementById('m-sn').value = '';
+}
+
+// ===================== HELPERS =====================
+function escQ(s) { return (s||'').replace(/'/g, "\\'"); }
+</script>
+</body>
+</html>
