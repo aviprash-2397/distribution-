@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DistribHub</title>
+<title>Vinita Enterprises - Order Management</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -22,7 +22,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-or{background:var(--or);color:#fff}.btn-or:hover:not(:disabled){background:var(--or2)}
 .btn-gr{background:#dcfce7;color:#166534}
 .btn-wa{background:#25D366;color:#fff}
-.btn-ghost{background:var(--bd);color:var(--tx)}
+.btn-ghost{background:transparent;color:var(--tx);border:none}
 .btn-outline{background:#fff;border:1px solid var(--bd);color:var(--tx)}
 .btn-sm{padding:7px 13px;font-size:13px;width:auto;border-radius:8px}
 .fg{margin-bottom:14px}
@@ -39,12 +39,17 @@ textarea{resize:none;height:70px}
 .cc:hover{border-color:var(--or)}
 .ci{width:52px;height:52px;background:var(--or);color:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;margin:0 auto 10px}
 .cn{font-size:14px;font-weight:500}
-.pr{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bd);gap:8px}
+.pr{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--bd);gap:12px}
 .pr:last-child{border-bottom:none}
-.pn{font-size:14px;font-weight:500}.ps{font-size:12px;color:var(--mu);margin-top:2px}
+.p-img{width:48px;height:48px;border-radius:8px;object-fit:cover;background:var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.pn{font-size:14px;font-weight:600}.ps{font-size:12px;color:var(--mu);margin-top:2px}
 .qc{display:flex;align-items:center;gap:5px;flex-shrink:0}
 .qb{width:28px;height:28px;border-radius:7px;border:1px solid var(--bd);background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .qi{width:38px;text-align:center;padding:4px;font-size:14px;border:1px solid var(--bd);border-radius:7px}
+.qty-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.qty-box{display:flex;flex-direction:column;gap:2px;background:#f8fafc;padding:6px;border-radius:6px;border:1px solid var(--bd);flex:1}
+.qty-box input{width:100%;padding:4px;text-align:center;border:1px solid var(--bd);border-radius:4px;font-size:13px}
+.qty-box label{margin:0;font-size:11px;color:var(--mu);text-align:center}
 .oc{background:var(--wh);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);border:1px solid var(--bd)}
 .oh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
 .on{font-size:16px;font-weight:600}.om{font-size:12px;color:var(--mu);margin-top:3px}
@@ -57,11 +62,11 @@ textarea{resize:none;height:70px}
 .tab.active{color:var(--or);border-bottom-color:var(--or)}
 .sb{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:9px 14px;display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .sb input{border:none;outline:none;flex:1;font-size:15px;background:transparent}
-.land{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#fff7ed,#fff)}
+.land{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:linear-gradient(160deg,#fff7ed,#fff);text-align:center}
 .ll{width:72px;height:72px;background:var(--or);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:18px}
-.lt{font-size:26px;font-weight:700;margin-bottom:4px}.ls{color:var(--mu);margin-bottom:40px;font-size:15px}
+.lt{font-size:26px;font-weight:700;margin-bottom:4px}.ls{color:var(--mu);margin-bottom:40px;font-size:14px;line-height:1.4}
 .rc{width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px}
-.rcard{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:18px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.15s}
+.rcard{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:18px;cursor:pointer;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.15s;text-align:left}
 .rcard:hover{border-color:var(--or);transform:translateY(-1px)}
 .ri{font-size:28px}.rt{font-size:16px;font-weight:600}.rd{font-size:13px;color:var(--mu);margin-top:2px}
 .empty{text-align:center;padding:40px 16px;color:var(--mu)}.ei{font-size:44px;margin-bottom:10px}
@@ -84,12 +89,11 @@ textarea{resize:none;height:70px}
 <body>
 <div id="toast"></div>
 
-<!-- LANDING -->
 <div id="pg-landing" class="pg active">
   <div class="land">
     <div class="ll">📦</div>
-    <h1 class="lt">DistribHub</h1>
-    <p class="ls">Wholesale Order Management</p>
+    <h1 class="lt">Vinita Enterprises</h1>
+    <p class="ls">Wholesale Order Management<br>Beside Barnwal Medico, Station Road, Patratu</p>
     <div class="rc">
       <div class="rcard" onclick="gotoPage('pg-salesman-select')">
         <div class="ri">🛵</div>
@@ -103,7 +107,6 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- SALESMAN SELECT -->
 <div id="pg-salesman-select" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-landing')">←</button>
@@ -112,7 +115,6 @@ textarea{resize:none;height:70px}
   <div class="ct"><div id="salesman-list"><div class="load">Loading...</div></div></div>
 </div>
 
-<!-- SALESMAN HOME -->
 <div id="pg-home" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="salesmanLogout()">←</button>
@@ -131,7 +133,6 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- COMPANY PRODUCTS (catalog view only) -->
 <div id="pg-company" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-home')">←</button>
@@ -143,7 +144,6 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- NEW / EDIT ORDER -->
 <div id="pg-new-order" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-home')">←</button>
@@ -153,7 +153,13 @@ textarea{resize:none;height:70px}
     <div id="cart-items"></div>
     <button class="btn btn-outline" onclick="gotoPage('pg-company-picker')" style="margin-bottom:14px">+ Add Products from Catalog</button>
     <div class="dv"></div>
-    <div class="fg"><label>Retailer *</label><select id="f-retailer"><option value="">Select retailer...</option></select></div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:5px;">
+      <label style="margin:0">Retailer *</label>
+      <button class="btn-ghost" style="padding:4px 8px; font-size:12px; border-radius:6px; font-weight:600; color:var(--or)" onclick="gotoPage('pg-add-retailer')">+ Add New Retailer</button>
+    </div>
+    <select id="f-retailer" style="margin-bottom:14px"><option value="">Select retailer...</option></select>
+    
     <div class="fg"><label>Payment Terms *</label>
       <select id="f-payment" onchange="toggleCredit()"><option value="cash">Cash</option><option value="credit">Credit</option></select>
     </div>
@@ -167,7 +173,21 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- COMPANY PICKER (for order cart) -->
+<div id="pg-add-retailer" class="pg">
+  <div class="hd">
+    <button class="hd-back" onclick="gotoPage('pg-new-order')">←</button>
+    <h2>Add New Retailer</h2>
+  </div>
+  <div class="ct">
+    <div class="card">
+      <div class="fg"><label>Shop Name *</label><input id="sr-rn" placeholder="e.g. Sharma General Store"></div>
+      <div class="fg"><label>Contact Number</label><input id="sr-rc" type="tel" placeholder="98XXXXXXXX"></div>
+      <div class="fg"><label>Area / Location</label><input id="sr-ra" placeholder="e.g. Main Market"></div>
+      <button class="btn btn-or" onclick="salesmanAddRetailer()">Save Retailer</button>
+    </div>
+  </div>
+</div>
+
 <div id="pg-company-picker" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-new-order')">←</button>
@@ -176,7 +196,6 @@ textarea{resize:none;height:70px}
   <div class="ct"><div id="picker-company-grid" class="cg"><div class="load">Loading...</div></div></div>
 </div>
 
-<!-- PRODUCT PICKER (for order cart) -->
 <div id="pg-product-picker" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-company-picker')">←</button>
@@ -192,7 +211,6 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="gotoPage('pg-landing')">←</button>
@@ -206,7 +224,6 @@ textarea{resize:none;height:70px}
   </div>
 </div>
 
-<!-- ADMIN DASHBOARD -->
 <div id="pg-admin" class="pg">
   <div class="hd">
     <button class="hd-back" onclick="adminLogout()">←</button>
@@ -236,7 +253,7 @@ textarea{resize:none;height:70px}
 const SUPABASE_URL = 'https://icboixkgnqkprljbledd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljYm9peGtnbnFrcHJsamJsZWRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MTgyNzIsImV4cCI6MjA5NDA5NDI3Mn0.4dg7sy_kMU2EJlqN1qzNodPAsb2VRLJBCGVtU5cgWl4';
 const ADMIN_PASSWORD = 'admin123'; // ⚠️ CHANGE THIS
-const FATHER_WHATSAPP = '919973478456'; // ⚠️ CHANGE TO FATHER'S NUMBER e.g. '919876543210'
+const FATHER_WHATSAPP = '919973478456'; 
 
 // ===================== DB =====================
 const { createClient } = supabase;
@@ -265,6 +282,11 @@ function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
 }
 function fmtOrder(n) { return 'ORD-' + String(n).padStart(4,'0'); }
+
+function getImgTag(url, alt) {
+  if(url) return `<img class="p-img" src="${url}" alt="Img" onerror="this.outerHTML='<div class=\\'p-img\\'>📦</div>'">`;
+  return `<div class="p-img">📦</div>`;
+}
 
 function gotoPage(id) {
   document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
@@ -354,8 +376,12 @@ function renderCatalogList(products) {
   el.innerHTML = `<div class="card" style="padding:8px 16px">` +
     products.map(p => `
       <div class="pr">
-        <div><div class="pn">${p.name}</div>
-        <div class="ps">${p.sku}${p.pack_size ? ' · '+p.pack_size : ''}${p.mrp ? ' · ₹'+p.mrp : ''}</div></div>
+        ${getImgTag(p.image_url, p.name)}
+        <div>
+          <div class="pn">${p.name}</div>
+          <div class="ps">${p.sku}${p.pack_size ? ' · '+p.pack_size : ''}</div>
+          <div class="ps" style="color:var(--or); font-weight:600; margin-top:4px">₹${p.rate || 0}</div>
+        </div>
       </div>`).join('') + `</div>`;
 }
 
@@ -383,11 +409,15 @@ function renderPickerList(products) {
     products.map(p => {
       const qty = S.cart.find(c => c.pid === p.id)?.qty || 0;
       return `<div class="pr">
-        <div style="flex:1;min-width:0"><div class="pn" style="word-break:break-word">${p.name}</div><div class="ps">${p.sku}${p.pack_size ? ' · '+p.pack_size : ''}</div></div>
+        ${getImgTag(p.image_url, p.name)}
+        <div style="flex:1;min-width:0">
+          <div class="pn" style="word-break:break-word">${p.name}</div>
+          <div class="ps">Rate: ₹${p.rate || 0}</div>
+        </div>
         <div class="qc">
-          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',-1)">−</button>
-          <input class="qi" id="qi-${p.id}" value="${qty}" type="number" min="0" onchange="setQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',this.value)">
-          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',1)">+</button>
+          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',${p.rate||0},'${p.image_url||''}',-1)">−</button>
+          <input class="qi" id="qi-${p.id}" value="${qty}" type="number" min="0" onchange="setQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',${p.rate||0},'${p.image_url||''}',this.value)">
+          <button class="qb" onclick="adjQty('${p.id}','${escQ(p.name)}','${p.sku}','${escQ(p.company_name)}',${p.rate||0},'${p.image_url||''}',1)">+</button>
         </div>
       </div>`;
     }).join('') + `</div>`;
@@ -399,23 +429,26 @@ function filterPicker() {
   renderPickerList(S.pickerProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
 }
 
-function adjQty(pid, name, sku, company, delta) {
+function adjQty(pid, name, sku, company, rate, img, delta) {
   const inp = document.getElementById('qi-'+pid);
   let qty = parseInt(inp?.value || 0) + delta;
   if (qty < 0) qty = 0;
   if (inp) inp.value = qty;
-  upsertCart(pid, name, sku, company, qty);
+  upsertCart(pid, name, sku, company, rate, img, qty);
 }
 
-function setQty(pid, name, sku, company, val) {
-  upsertCart(pid, name, sku, company, Math.max(0, parseInt(val)||0));
+function setQty(pid, name, sku, company, rate, img, val) {
+  upsertCart(pid, name, sku, company, rate, img, Math.max(0, parseInt(val)||0));
 }
 
-function upsertCart(pid, name, sku, company, qty) {
+function upsertCart(pid, name, sku, company, rate, img, qty) {
   const idx = S.cart.findIndex(c => c.pid === pid);
-  if (qty <= 0) { if (idx > -1) S.cart.splice(idx, 1); }
+  if (qty <= 0) { 
+    if (idx > -1 && S.cart[idx].bonus === 0) S.cart.splice(idx, 1); 
+    else if (idx > -1) S.cart[idx].qty = 0;
+  }
   else if (idx > -1) S.cart[idx].qty = qty;
-  else S.cart.push({pid, name, sku, company, qty});
+  else S.cart.push({pid, name, sku, company, rate, img, qty, bonus: 0});
   updateCartLabel();
 }
 
@@ -435,8 +468,29 @@ async function loadRetailers() {
 function refreshRetailerDropdown() {
   const sel = document.getElementById('f-retailer');
   if (!sel) return;
+  const currentVal = sel.value;
   sel.innerHTML = '<option value="">Select retailer...</option>' +
     S.retailers.map(r => `<option value="${r.id}">${r.name}${r.area ? ' ('+r.area+')' : ''}</option>`).join('');
+  if(currentVal) sel.value = currentVal;
+}
+
+async function salesmanAddRetailer() {
+  const name = document.getElementById('sr-rn').value.trim();
+  if (!name) { toast('Shop name required'); return; }
+  
+  const { data, error } = await db.from('retailers').insert({
+    name, 
+    contact: document.getElementById('sr-rc').value.trim()||null, 
+    area: document.getElementById('sr-ra').value.trim()||null
+  }).select().single();
+  
+  if (error) { toast('❌ '+error.message); return; }
+  
+  toast('✅ Retailer added');
+  ['sr-rn','sr-rc','sr-ra'].forEach(id => document.getElementById(id).value = '');
+  await loadRetailers();
+  gotoPage('pg-new-order');
+  setTimeout(() => { document.getElementById('f-retailer').value = data.id; }, 100);
 }
 
 function renderCart() {
@@ -449,30 +503,31 @@ function renderCart() {
   el.innerHTML = `<div class="card" style="padding:8px 16px;margin-bottom:14px">
     <div style="font-size:13px;font-weight:600;color:var(--mu);padding:8px 0 4px">ORDER ITEMS</div>` +
     S.cart.map(item => `
-      <div class="pr">
-        <div style="flex:1;min-width:0"><div class="pn" style="word-break:break-word">${item.name}</div><div class="ps">${item.sku}${item.company ? ' · '+item.company : ''}</div></div>
-        <div class="qc">
-          <button class="qb" onclick="adjCart('${item.pid}',-1)">−</button>
-          <input class="qi" value="${item.qty}" type="number" min="0" onchange="setCart('${item.pid}',this.value)">
-          <button class="qb" onclick="adjCart('${item.pid}',1)">+</button>
+      <div style="padding: 12px 0; border-bottom: 1px solid var(--bd);">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px">
+          ${getImgTag(item.img, item.name)}
+          <div style="flex:1;min-width:0"><div class="pn" style="word-break:break-word">${item.name}</div><div class="ps">${item.sku}</div></div>
+        </div>
+        <div class="qty-row">
+          <div class="qty-box"><label>Qty</label><input type="number" min="0" value="${item.qty}" onchange="updateCartItem('${item.pid}', 'qty', this.value)"></div>
+          <div class="qty-box"><label>Free/Bonus</label><input type="number" min="0" value="${item.bonus||0}" onchange="updateCartItem('${item.pid}', 'bonus', this.value)"></div>
+          <div class="qty-box"><label>Rate ₹</label><input type="number" min="0" step="0.01" value="${item.rate||0}" onchange="updateCartItem('${item.pid}', 'rate', this.value)"></div>
         </div>
       </div>`).join('') + `</div>`;
 }
 
-function adjCart(pid, delta) {
+function updateCartItem(pid, field, val) {
   const item = S.cart.find(c => c.pid === pid);
   if (!item) return;
-  item.qty = Math.max(0, item.qty + delta);
-  if (item.qty === 0) S.cart = S.cart.filter(c => c.pid !== pid);
+  let v = parseFloat(val);
+  if (isNaN(v) || v < 0) v = 0;
+  item[field] = v;
+  
+  if (item.qty === 0 && item.bonus === 0) {
+    S.cart = S.cart.filter(c => c.pid !== pid);
+  }
   renderCart();
-}
-
-function setCart(pid, val) {
-  const item = S.cart.find(c => c.pid === pid);
-  if (!item) return;
-  item.qty = Math.max(0, parseInt(val)||0);
-  if (item.qty === 0) S.cart = S.cart.filter(c => c.pid !== pid);
-  renderCart();
+  updateCartLabel();
 }
 
 function toggleCredit() {
@@ -517,23 +572,40 @@ async function placeOrder() {
       orderId = ord.id;
     }
 
-    await db.from('order_items').insert(S.cart.map(c => ({ order_id: orderId, product_id: c.pid, quantity: c.qty })));
+    await db.from('order_items').insert(S.cart.map(c => ({ 
+      order_id: orderId, 
+      product_id: c.pid, 
+      quantity: c.qty,
+      bonus_quantity: c.bonus || 0,
+      rate: c.rate || 0
+    })));
 
     // Get order number for WhatsApp
     const { data: ord2 } = await db.from('orders').select('order_number').eq('id', orderId).single();
     const retailerName = S.retailers.find(r => r.id === retailer_id)?.name || '';
-    const itemLines = S.cart.map(c => `• ${c.name} (${c.sku}) x ${c.qty}`).join('\n');
+    
+    let totalAmt = 0;
+    const itemLines = S.cart.map(c => {
+      const lineTotal = c.qty * (c.rate || 0);
+      totalAmt += lineTotal;
+      let line = `• ${c.name} x ${c.qty}`;
+      if (c.bonus > 0) line += ` (+${c.bonus} Free)`;
+      line += ` @ ₹${c.rate} = ₹${lineTotal}`;
+      return line;
+    }).join('\n');
+
     const isEdit = !!S.editingOrderId;
     const msg = encodeURIComponent(
       `📦 *${isEdit ? 'UPDATED' : 'NEW'} ORDER — ${fmtOrder(ord2?.order_number||0)}*\n` +
+      `🏢 Vinita Enterprises\n` +
       `👤 Salesman: ${S.salesman.name}\n` +
       `🏪 Retailer: ${retailerName}\n` +
       `📅 Date: ${fmtDate(new Date().toISOString())}\n` +
       (delivery_date ? `🚚 Deliver by: ${fmtDate(delivery_date)}\n` : '') +
-      `\n*Items:*\n${itemLines}\n\n` +
+      `\n*Items:*\n${itemLines}\n` +
+      `\n💰 *Total Amount: ₹${totalAmt}*\n\n` +
       `💳 Payment: ${payment_term === 'cash' ? 'Cash' : 'Credit (' + credit_period_days + ' days)'}\n` +
-      (notes ? `📝 Notes: ${notes}\n` : '') +
-      `\n✅ Sent via DistribHub`
+      (notes ? `📝 Notes: ${notes}\n` : '')
     );
 
     S.cart = []; S.editingOrderId = null;
@@ -556,34 +628,53 @@ async function loadSalesmanOrders() {
   const el = document.getElementById('salesman-orders');
   el.innerHTML = '<div class="load">Loading...</div>';
   const { data } = await db.from('orders')
-    .select('*, retailers(name), order_items(quantity, products(name,sku)), payments(status)')
+    .select('*, retailers(name), order_items(quantity, bonus_quantity, rate, products(name,sku)), payments(status)')
     .eq('salesman_id', S.salesman.id)
     .order('created_at', {ascending: false});
+    
   if (!data?.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div>No orders placed yet.</div>'; return; }
-  el.innerHTML = data.map(o => `
+  
+  el.innerHTML = data.map(o => {
+    const totalValue = (o.order_items||[]).reduce((sum, i) => sum + (i.quantity * (i.rate||0)), 0);
+    return `
     <div class="oc">
       <div class="oh">
         <div><div class="on">${fmtOrder(o.order_number)}</div>
         <div class="om">${o.retailers?.name || '-'} · ${fmtDate(o.order_date)}</div></div>
         <span class="badge b-${o.status}">${o.status === 'placed' ? 'Pending' : 'Done'}</span>
       </div>
-      <div>${(o.order_items||[]).map(i => `<div class="oi-row"><span>${i.products?.name}</span><span>${i.quantity} pcs</span></div>`).join('')}</div>
+      <div style="margin-bottom:8px">${(o.order_items||[]).map(i => {
+        let text = `${i.quantity} pcs`;
+        if (i.bonus_quantity > 0) text += ` <span style="color:var(--or);font-size:11px">(+${i.bonus_quantity} free)</span>`;
+        return `<div class="oi-row"><span>${i.products?.name}</span><span>${text}</span></div>`;
+      }).join('')}</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total: ₹${totalValue}</div>
       <div class="of">
         <span class="badge b-${o.payment_term}">${o.payment_term}</span>
         <span class="badge b-${o.payments?.[0]?.status||'unpaid'}">${o.payments?.[0]?.status === 'paid' ? '💚 Paid' : '🔴 Unpaid'}</span>
         ${o.status === 'placed' ? `<button class="btn btn-ghost btn-sm" onclick="editOrder('${o.id}')">✏️ Edit</button>` : ''}
         <button class="btn btn-wa btn-sm" onclick="resendWhatsApp('${o.id}')">📲 WhatsApp</button>
       </div>
-    </div>`).join('');
+    </div>`
+  }).join('');
 }
 
 async function editOrder(orderId) {
   const { data: o } = await db.from('orders')
-    .select('*, retailers(id,name), order_items(quantity, product_id, products(name,sku))')
+    .select('*, retailers(id,name), order_items(quantity, bonus_quantity, rate, product_id, products(name,sku,image_url))')
     .eq('id', orderId).single();
   if (!o) return;
   S.editingOrderId = orderId;
-  S.cart = o.order_items.map(i => ({ pid: i.product_id, name: i.products?.name||'', sku: i.products?.sku||'', company:'', qty: i.quantity }));
+  S.cart = o.order_items.map(i => ({ 
+    pid: i.product_id, 
+    name: i.products?.name||'', 
+    sku: i.products?.sku||'', 
+    company:'', 
+    qty: i.quantity,
+    bonus: i.bonus_quantity || 0,
+    rate: i.rate || 0,
+    img: i.products?.image_url || ''
+  }));
   document.getElementById('order-form-title').textContent = 'Edit Order';
   document.getElementById('f-payment').value = o.payment_term;
   toggleCredit();
@@ -597,12 +688,22 @@ async function editOrder(orderId) {
 
 async function resendWhatsApp(orderId) {
   const { data: o } = await db.from('orders')
-    .select('*, retailers(name), salesmen(name), order_items(quantity, products(name,sku))')
+    .select('*, retailers(name), salesmen(name), order_items(quantity, bonus_quantity, rate, products(name,sku))')
     .eq('id', orderId).single();
   if (!o) return;
-  const itemLines = (o.order_items||[]).map(i => `• ${i.products?.name} (${i.products?.sku}) x ${i.quantity}`).join('\n');
+  
+  let totalAmt = 0;
+  const itemLines = (o.order_items||[]).map(i => {
+    const lineTotal = i.quantity * (i.rate || 0);
+    totalAmt += lineTotal;
+    let line = `• ${i.products?.name} x ${i.quantity}`;
+    if (i.bonus_quantity > 0) line += ` (+${i.bonus_quantity} Free)`;
+    line += ` @ ₹${i.rate||0} = ₹${lineTotal}`;
+    return line;
+  }).join('\n');
+  
   const msg = encodeURIComponent(
-    `📦 *Order ${fmtOrder(o.order_number)}*\n👤 ${o.salesmen?.name}\n🏪 ${o.retailers?.name}\n📅 ${fmtDate(o.order_date)}\n\n*Items:*\n${itemLines}\n\n💳 ${o.payment_term === 'cash' ? 'Cash' : 'Credit ('+o.credit_period_days+'d)'}${o.notes ? '\n📝 '+o.notes : ''}`
+    `📦 *Order ${fmtOrder(o.order_number)}*\n🏢 Vinita Enterprises\n👤 ${o.salesmen?.name}\n🏪 ${o.retailers?.name}\n📅 ${fmtDate(o.order_date)}\n\n*Items:*\n${itemLines}\n\n💰 *Total Amount: ₹${totalAmt}*\n\n💳 ${o.payment_term === 'cash' ? 'Cash' : 'Credit ('+o.credit_period_days+'d)'}${o.notes ? '\n📝 '+o.notes : ''}`
   );
   window.open(`https://wa.me/${FATHER_WHATSAPP}?text=${msg}`, '_blank');
 }
@@ -641,7 +742,7 @@ async function loadAdminStats() {
 
 async function loadAdminOrders() {
   const { data } = await db.from('orders')
-    .select('*, retailers(name), salesmen(name), order_items(quantity, products(name,sku)), payments(id,status)')
+    .select('*, retailers(name), salesmen(name), order_items(quantity, bonus_quantity, rate, products(name,sku)), payments(id,status)')
     .order('created_at', {ascending:false});
   S.adminOrders = data || [];
   renderAdminOrders(S.adminOrders);
@@ -659,7 +760,10 @@ function filterOrders(filter, el) {
 function renderAdminOrders(orders) {
   const el = document.getElementById('admin-orders-list');
   if (!orders.length) { el.innerHTML = '<div class="empty"><div class="ei">📋</div>No orders found.</div>'; return; }
-  el.innerHTML = orders.map(o => `
+  
+  el.innerHTML = orders.map(o => {
+    const totalValue = (o.order_items||[]).reduce((sum, i) => sum + (i.quantity * (i.rate||0)), 0);
+    return `
     <div class="oc">
       <div class="oh">
         <div><div class="on">${fmtOrder(o.order_number)}</div>
@@ -667,15 +771,21 @@ function renderAdminOrders(orders) {
         <div class="om">${fmtDate(o.order_date)}${o.delivery_date ? ' · Deliver: '+fmtDate(o.delivery_date) : ''}</div></div>
         <span class="badge b-${o.status}">${o.status === 'placed' ? 'Pending' : 'Done'}</span>
       </div>
-      <div>${(o.order_items||[]).map(i => `<div class="oi-row"><span>${i.products?.name}</span><span>${i.quantity} pcs</span></div>`).join('')}</div>
-      ${o.notes ? `<div style="font-size:13px;color:var(--mu);margin-top:6px">📝 ${o.notes}</div>` : ''}
+      <div style="margin-bottom:8px">${(o.order_items||[]).map(i => {
+        let text = `${i.quantity} pcs`;
+        if (i.bonus_quantity > 0) text += ` <span style="color:var(--or);font-size:11px">(+${i.bonus_quantity} free)</span>`;
+        return `<div class="oi-row"><span>${i.products?.name}</span><span>${text}</span></div>`;
+      }).join('')}</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px">Total Value: ₹${totalValue}</div>
+      ${o.notes ? `<div style="font-size:13px;color:var(--mu);margin-bottom:6px">📝 ${o.notes}</div>` : ''}
       <div class="of">
         <span class="badge b-${o.payment_term}">${o.payment_term}${o.payment_term==='credit' ? ' ('+o.credit_period_days+'d)':''}</span>
         <span class="badge b-${o.payments?.[0]?.status||'unpaid'}">${o.payments?.[0]?.status==='paid' ? '💚 Paid':'🔴 Unpaid'}</span>
         ${o.status==='placed' ? `<button class="btn btn-gr btn-sm" onclick="markDone('${o.id}')">✅ Done</button>` : ''}
         ${o.payments?.[0]?.status!=='paid' ? `<button class="btn btn-or btn-sm" onclick="markPaid('${o.payments?.[0]?.id}')">💰 Paid</button>` : ''}
       </div>
-    </div>`).join('');
+    </div>`
+  }).join('');
 }
 
 async function markDone(orderId) {
@@ -784,7 +894,9 @@ async function showForm(type) {
       <div class="fg"><label>SKU Code *</label><input id="m-psku" placeholder="e.g. HUL-SE-1KG"></div>
       <div class="fg"><label>Category</label><input id="m-pcat" placeholder="e.g. Detergent, Beverages"></div>
       <div class="fg"><label>Pack Size</label><input id="m-psz" placeholder="e.g. 1kg, 500ml, 12pcs"></div>
+      <div class="fg"><label>Rate (₹) *</label><input id="m-prate" type="number" placeholder="0.00" step="0.01"></div>
       <div class="fg"><label>MRP (₹)</label><input id="m-pmrp" type="number" placeholder="0.00" step="0.01"></div>
+      <div class="fg"><label>Image URL</label><input id="m-pimg" placeholder="https://..."></div>
       <div class="fg"><label>Notes</label><input id="m-pnt" placeholder="Optional"></div>
       <button class="btn btn-or" onclick="addProduct()">Add Product</button></div>`;
   } else if (type === 'retailer') {
@@ -819,12 +931,15 @@ async function addProduct() {
     category: document.getElementById('m-pcat').value.trim()||null,
     pack_size: document.getElementById('m-psz').value.trim()||null,
     mrp: parseFloat(document.getElementById('m-pmrp').value)||null,
+    rate: parseFloat(document.getElementById('m-prate').value)||0,
+    image_url: document.getElementById('m-pimg').value.trim()||null,
     notes: document.getElementById('m-pnt').value.trim()||null,
   });
   if (error) { toast('❌ '+error.message); return; }
   toast('✅ Product added');
-  document.getElementById('m-pn').value = '';
-  document.getElementById('m-psku').value = '';
+  ['m-pn','m-psku','m-pmrp','m-prate','m-pimg'].forEach(id => {
+    if(document.getElementById(id)) document.getElementById(id).value = '';
+  });
 }
 
 async function addRetailer() {
